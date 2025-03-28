@@ -44,17 +44,35 @@ def get_gru(units):
     return model
 
 def get_cnn(units):
-    """Build CNN Model  
-    #Arguements:
+    """Build CNN Model (Convolutional Neural Network)
+    
+    # Arguments:
         units: List(int), number of input, output and hidden units.
-    #Return:   
+               units[0]: input length
+               units[1]: first conv layer filters
+               units[2]: second conv layer filters
+               units[3]: output dimension
+    
+    # Returns:   
         model: Model, nn model 
     """
     model = Sequential()
-    model.add(LSTM(units[1], input_shape=(units[0], 1), return_sequences=True))
-    model.add(LSTM(units[2]))
-    model.add(Dropout(0.2))
-    model.add(Dense(units[3], activation="sigmoid"))
+    # First convolutional layer
+    model.add(Conv1D(filters=units[1], kernel_size=3, activation='relu',
+                    padding='same', input_shape=(units[0], 1)))
+    model.add(MaxPooling1D(pool_size=2))
+    # Second convolutional layer
+    model.add(Conv1D(filters=units[2], kernel_size=3, activation='relu',
+                    padding='same'))
+    model.add(MaxPooling1D(pool_size=2))
+    # Flatten layer to connect to dense layer
+    model.add(Flatten())
+    # Dense layer with dropout for regularization
+    model.add(Dense(units[2]))
+    model.add(Activation('relu'))
+    model.add(Dropout(0.3))
+    # Output layer
+    model.add(Dense(units[3], activation='sigmoid'))
     return model
 
 
