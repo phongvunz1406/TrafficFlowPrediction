@@ -36,10 +36,6 @@ def predict():
     # Clear previous output
     output_text.delete('1.0', tk.END)
     
-    # Clear previous route frames
-    for widget in routes_frame.winfo_children():
-        widget.destroy()
-
     # Get coordinates from SCATS
     origin_coord = get_coords_from_scats(origin_input)
     dest_coord = get_coords_from_scats(destination_input)
@@ -67,34 +63,27 @@ def predict():
             
         except Exception as error:
             # Schedule error display on the main thread
-            error_message = str(error)
-            root.after(0, lambda msg=error_message: display_error(msg))
+            root.after(0, lambda: display_error(str(error)))
     
     def update_ui(result):
-        try:
-            # Clear loading message
-            output_text.delete('1.0', tk.END)
-            
-            # Display results in text area
-            output_text.insert(tk.END, result)
-            
-            # Enable view map button
-            view_map_button.config(state=tk.NORMAL)
-            
-            # Update status
-            status_var.set("Ready")
-            
-            # Re-enable the predict button
-            predict_button.config(state=tk.NORMAL)
-            
-        except Exception as e:
-            display_error(str(e))
+        # Clear loading message
+        output_text.delete('1.0', tk.END)
+        
+        # Display results in text area
+        output_text.insert(tk.END, result)
+        
+        # Enable view map button
+        view_map_button.config(state=tk.NORMAL)
+        
+        # Update status
+        status_var.set("Ready")
+        
+        # Re-enable the predict button
+        predict_button.config(state=tk.NORMAL)
     
     def display_error(error_message):
         output_text.delete('1.0', tk.END)
         output_text.insert(tk.END, f"Error: {error_message}\n")
-        import traceback
-        traceback.print_exc()
         status_var.set("Error occurred")
         predict_button.config(state=tk.NORMAL)
     
@@ -220,10 +209,6 @@ output_frame.pack(fill=tk.BOTH, expand=True, pady=5)
 # Add scrolled text for output
 output_text = scrolledtext.ScrolledText(output_frame, height=20, wrap=tk.WORD)
 output_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-
-# Create a frame for route details (may not be used with the simplified version)
-routes_frame = tk.Frame(main_frame)
-routes_frame.pack(fill=tk.BOTH, expand=True, pady=5)
 
 if __name__ == "__main__":
     root.mainloop()
